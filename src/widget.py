@@ -18,8 +18,7 @@ def mask_account_card(account_card: str) -> str:
     elif len_nums_account_str == 20:
         mask_account = get_mask_account(nums_account_str)
         return f"{type_card} {mask_account}"
-    return f"Ошибка! Неправильный номер."
-
+    return "Ошибка! Неправильный номер."
 
 
 def get_date(date: str) -> str:
