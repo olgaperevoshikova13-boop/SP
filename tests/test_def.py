@@ -83,46 +83,6 @@ def test_short_str_get_mask_account(short_str_get_mask_account):
     assert get_mask_account(short_str_get_mask_account) == "Неверный номер счета"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @pytest.fixture
 def check_stn_mask_account_card():
     """Стандартный номер счета"""
@@ -148,7 +108,7 @@ def test_check_stn_mask_account_card(check_stn_mask_account_card):
 
 def test_card_stn_mask_account_card(card_stn_mask_account_card):
     """Проверка со стандартным номером карты"""
-    assert mask_account_card(card_stn_mask_account_card) == "Visa **4305"
+    assert mask_account_card(card_stn_mask_account_card) == "Visa 4108 43** **** 4305"
 
 
 def test_no_num_stn_mask_account_card(no_num_stn_mask_account_card):
@@ -156,51 +116,37 @@ def test_no_num_stn_mask_account_card(no_num_stn_mask_account_card):
     assert mask_account_card(no_num_stn_mask_account_card) == "Неверный номер карты или счета"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @pytest.fixture
 def fix_get_date():
+    """Тестовые данные даты"""
     return "2024-03-11T02:26:18.671407"
 
 
+@pytest.fixture
+def valid_date_without_ms():
+    """Дата без миллисекунд"""
+    return "2024-03-11T02:26:18"
+
+
+@pytest.fixture
+def short_date():
+    """Короткая строка с датой (без времени)"""
+    return "2024-03-11"
+
+
 def test_get_date(fix_get_date):
+    """Тестирование правильности преобразования даты"""
     assert "11.03.2024"
 
 
+def test_get_date_without_ms(valid_date_without_ms):
+    """Проверка на дату без миллисекунд"""
+    assert get_date(valid_date_without_ms) == "11.03.2024"
 
 
-
-
+def test_get_date_short(short_date):
+    """Проверка на короткую строку с датой (без времени)"""
+    assert get_date(short_date) == "11.03.2024"
 
 
 

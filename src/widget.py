@@ -10,6 +10,8 @@ def mask_account_card(account_card: str) -> str:
     """Обрабатывает информацию о картах и счетах"""
     type_card = " ".join(re.findall(r"\b[a-zA-Zа-яА-Я]+\b", account_card))
     nums_account = re.findall(r"\d+", account_card)
+    if not nums_account:
+        return "Неверный номер карты или счета"
     nums_account_str = nums_account[0]
     len_nums_account_str = len(nums_account_str)
     if len_nums_account_str == 16:
@@ -22,7 +24,6 @@ def mask_account_card(account_card: str) -> str:
 
 
 def get_date(date: str) -> str:
-
     """Принимает один формат даты и возвращает более удобный формат"""
     return f"{date[8:10]}.{date[5:7]}.{date[0:4]}"
 
