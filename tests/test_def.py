@@ -49,22 +49,143 @@ def test_get_mask_card_number_empty(empty_get_mask_card_number):
     """Проверка на пустой ввод"""
     assert get_mask_card_number(empty_get_mask_card_number) == "Неверный номер карты"
 
+
 @pytest.fixture
-def fix_get_mask_account():
+def stn_int_get_mask_account():
+    """Ввод номера счета стандартное кол-во цифр (20) числом"""
+    return 12345678912345678912
+
+
+@pytest.fixture
+def stn_str_get_mask_account():
+    """Ввод номера счета стандартное кол-во цифр (20) строкой"""
     return '12345678912345678912'
 
 
-def test_get_mask_account(fix_get_mask_account):
-    assert get_mask_account(fix_get_mask_account) == '**8912'
+@pytest.fixture
+def short_str_get_mask_account():
+    """Ввод номера счета - короткий номер, строкой"""
+    return '1234'
+
+
+def test_stn_int_get_mask_account(stn_int_get_mask_account):
+    """Проверка на ввод номера счета стандартной длины, числом"""
+    assert get_mask_account(stn_int_get_mask_account) == '**8912'
+
+
+def test_stn_str_get_mask_account(stn_str_get_mask_account):
+    """Проверка на ввод номера счета стандартной длины, строкой"""
+    assert get_mask_account(stn_str_get_mask_account) == '**8912'
+
+
+def test_short_str_get_mask_account(short_str_get_mask_account):
+    """Проверка на ввод номера счета короткой длины, строкой"""
+    assert get_mask_account(short_str_get_mask_account) == "Неверный номер счета"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @pytest.fixture
-def fix_mask_account_card():
+def check_stn_mask_account_card():
+    """Стандартный номер счета"""
     return "Счет 73654108430135874305"
 
 
-def test_mask_account_card(fix_mask_account_card):
-    assert mask_account_card(fix_mask_account_card) == "Счет **4305"
+@pytest.fixture
+def card_stn_mask_account_card():
+    """Стандартный номер карты"""
+    return "Visa 4108430135874305"
+
+
+@pytest.fixture
+def no_num_stn_mask_account_card():
+    """Отсутствие номера"""
+    return "Visa "
+
+
+def test_check_stn_mask_account_card(check_stn_mask_account_card):
+    """Проверка со стандартным номером счета"""
+    assert mask_account_card(check_stn_mask_account_card) == "Счет **4305"
+
+
+def test_card_stn_mask_account_card(card_stn_mask_account_card):
+    """Проверка со стандартным номером карты"""
+    assert mask_account_card(card_stn_mask_account_card) == "Visa **4305"
+
+
+def test_no_num_stn_mask_account_card(no_num_stn_mask_account_card):
+    """Проверка без номера"""
+    assert mask_account_card(no_num_stn_mask_account_card) == "Неверный номер карты или счета"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @pytest.fixture
@@ -74,6 +195,21 @@ def fix_get_date():
 
 def test_get_date(fix_get_date):
     assert "11.03.2024"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @pytest.fixture
@@ -91,6 +227,36 @@ def test_filter_by_state(fix_filter_by_state):
         {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
         {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'}
         ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @pytest.fixture
