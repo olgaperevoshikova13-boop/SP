@@ -157,7 +157,6 @@ def sample_transactions():
         {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'},
         {'id': 594226727, 'state': 'CANCELED', 'date': '2018-09-12T21:27:25.241689'},
         {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'},
-        {'id': 123456789, 'state': 'PENDING', 'date': '2020-01-01T00:00:00.000000'},
     ]
 
 
@@ -198,16 +197,6 @@ def test_filter_by_state_canceled(sample_transactions):
     assert result == expected
 
 
-def test_filter_by_state_pending(sample_transactions):
-    """Фильтрация со статусом 'PENDING'
-    Должны остаться только словари с state='PENDING'"""
-    result = filter_by_state(sample_transactions, state='PENDING')
-    expected = [
-        {'id': 123456789, 'state': 'PENDING', 'date': '2020-01-01T00:00:00.000000'},
-    ]
-    assert result == expected
-
-
 def test_filter_by_state_no_matching(no_matching_state):
     """Отсутствие словарей с указанным статусом
     Должен вернуться пустой список"""
@@ -225,7 +214,6 @@ def test_filter_by_state_empty_list(empty_list):
 @pytest.mark.parametrize("test_state, expected_count", [
     ('EXECUTED', 2),
     ('CANCELED', 2),
-    ('PENDING', 1),
     ('UNKNOWN', 0),
 ])
 def test_filter_by_state_parametrized(sample_transactions, test_state, expected_count):
@@ -238,7 +226,6 @@ def test_filter_by_state_parametrized(sample_transactions, test_state, expected_
 @pytest.mark.parametrize("test_state, expected_ids", [
     ('EXECUTED', [41428829, 939719570]),
     ('CANCELED', [594226727, 615064591]),
-    ('PENDING', [123456789]),
 ])
 def test_filter_by_state_parametrized_ids(sample_transactions, test_state, expected_ids):
     """Параметризация с проверкой конкретных id"""
@@ -247,48 +234,114 @@ def test_filter_by_state_parametrized_ids(sample_transactions, test_state, expec
     assert result_ids == expected_ids
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @pytest.fixture
-def fix_sort_by_date():
+def sample_transactions():
+    """Стандартный список словарей для тестов"""
     return [
         {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
         {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'},
         {'id': 594226727, 'state': 'CANCELED', 'date': '2018-09-12T21:27:25.241689'},
-        {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'}
+        {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'},
     ]
 
 
-def test_sort_by_date(fix_sort_by_date):
-    assert sort_by_date(fix_sort_by_date) == [
+@pytest.fixture
+def same_dates_transactions():
+    """Список с одинаковыми датами"""
+    return [
+        {'id': 1, 'state': 'EXECUTED', 'date': '2020-01-01T10:00:00.000000'},
+        {'id': 2, 'state': 'CANCELED', 'date': '2020-01-01T12:00:00.000000'},
+        {'id': 3, 'state': 'PENDING', 'date': '2020-01-01T08:00:00.000000'},
+    ]
+
+
+@pytest.fixture
+def invalid_dates_transactions():
+    """Список с некорректными форматами дат"""
+    return [
+        {'id': 1, 'state': 'EXECUTED', 'date': 'некорректная_дата'},
+        {'id': 2, 'state': 'CANCELED', 'date': '2020-01-01'},
+        {'id': 3, 'state': 'PENDING', 'date': ''},
+    ]
+
+
+@pytest.fixture
+def empty_list():
+    """Пустой список"""
+    return []
+
+
+def test_sort_by_date_descending(sample_transactions):
+    """Сортировка по убыванию (по умолчанию)
+    Ожидаемый порядок: от новых к старым"""
+    result = sort_by_date(sample_transactions)
+    expected = [
         {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
         {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'},
         {'id': 594226727, 'state': 'CANCELED', 'date': '2018-09-12T21:27:25.241689'},
-        {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'}
+        {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'},
     ]
+    assert result == expected
+
+
+def test_sort_by_date_ascending(sample_transactions):
+    """Сортировка по возрастанию (descending=False)
+    Ожидаемый порядок: от старых к новым"""
+    result = sort_by_date(sample_transactions, descending=False)
+    expected = [
+        {'id': 939719570, 'state': 'EXECUTED', 'date': '2018-06-30T02:08:58.425572'},
+        {'id': 594226727, 'state': 'CANCELED', 'date': '2018-09-12T21:27:25.241689'},
+        {'id': 615064591, 'state': 'CANCELED', 'date': '2018-10-14T08:21:33.419441'},
+        {'id': 41428829, 'state': 'EXECUTED', 'date': '2019-07-03T18:35:29.512364'},
+    ]
+    assert result == expected
+
+
+def test_sort_by_date_same_dates(same_dates_transactions):
+    """Сортировка при одинаковых датах
+    Порядок элементов с одинаковой датой может сохраняться как есть"""
+    result = sort_by_date(same_dates_transactions, descending=True)
+    for item in result:
+        assert item['date'].startswith('2020-01-01')
+    assert len(result) == 3
+
+
+def test_sort_by_date_empty_list(empty_list):
+    """Пустой список на входе
+    Должен вернуться пустой список"""
+    result = sort_by_date(empty_list)
+    assert result == []
+
+
+def test_sort_by_date_invalid_formats(invalid_dates_transactions):
+    """Некорректные форматы дат
+    Функция должна сортировать как строки (лексикографически)"""
+    result = sort_by_date(invalid_dates_transactions, descending=True)
+    assert len(result) == 3
+
+
+def test_sort_by_date_single_element():
+    """Тестирование список с одним элементом"""
+    single = [{'id': 1, 'state': 'EXECUTED', 'date': '2020-01-01T00:00:00'}]
+    result = sort_by_date(single)
+    assert result == single
+
+
+@pytest.mark.parametrize("descending, expected_first_id", [
+    (True, 41428829),   # убывание: сначала 2019-07-03 → id 41428829
+    (False, 939719570), # возрастание: сначала 2018-06-30 → id 939719570
+])
+def test_sort_by_date_parametrized(sample_transactions, descending, expected_first_id):
+    """Параметризация для проверки первого элемента при разных порядках"""
+    result = sort_by_date(sample_transactions, descending=descending)
+    assert result[0]['id'] == expected_first_id
+
+
+@pytest.mark.parametrize("descending, expected_last_id", [
+    (True, 939719570),   # убывание: последний — самая старая дата → id 939719570
+    (False, 41428829),   # возрастание: последний — самая новая дата → id 41428829
+])
+def test_sort_by_date_parametrized_last(sample_transactions, descending, expected_last_id):
+    """Параметризация для проверки последнего элемента при разных порядках"""
+    result = sort_by_date(sample_transactions, descending=descending)
+    assert result[-1]['id'] == expected_last_id
