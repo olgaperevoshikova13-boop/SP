@@ -1,8 +1,8 @@
 
 import re
 
-from masks import get_mask_account
-from masks import get_mask_card_number
+from src.masks import get_mask_account
+from src.masks import get_mask_card_number
 
 
 def mask_account_card(account_card: str) -> str:
