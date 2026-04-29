@@ -1,13 +1,22 @@
 
 import re
 
-from masks import get_mask_account
-from masks import get_mask_card_number
+from src.masks import get_mask_account
+from src.masks import get_mask_card_number
 
 
 def mask_account_card(account_card: str) -> str:
 
-    """Обрабатывает информацию о картах и счетах"""
+    """ Принимает строку с типом карты/счёта и номером.
+
+    Определяет по длине номера (16 цифр — карта, 20 — счёт),
+    маскирует номер с помощью соответствующих функций.
+    Параметры:
+        account_card (str): строка вида "Visa Platinum 1234567890123456"
+                            или "Счет 73654108430135874305"
+    Возвращает:
+        str: замаскированный номер с типом карты/счёта,
+             или сообщение об ошибке"""
     type_card = " ".join(re.findall(r"\b[a-zA-Zа-яА-Я]+\b", account_card))
     nums_account = re.findall(r"\d+", account_card)
     nums_account_str = nums_account[0]
@@ -18,6 +27,7 @@ def mask_account_card(account_card: str) -> str:
     elif len_nums_account_str == 20:
         mask_account = get_mask_account(nums_account_str)
         return f"{type_card} {mask_account}"
+    return "Ошибка! Неправильный номер."
 
 
 def get_date(date: str) -> str:
