@@ -1,5 +1,9 @@
 
-from typing import List, Dict, Any, Iterator
+from typing import Any
+from typing import Dict
+from typing import Iterator
+from typing import List
+
 
 def filter_by_currency(transactions: List[Dict[str, Any]], currency: str = 'USD') -> Iterator[Dict[str, Any]]:
     """
@@ -31,7 +35,7 @@ def transaction_descriptions(transactions: List[Dict[str, Any]]) -> Iterator[str
         yield transaction.get("description", "Описание отсутствует")
 
 
-def  card_number_generator(start: int, end: int) -> Iterator[str]:
+def card_number_generator(start: int, end: int) -> Iterator[str]:
     """
         Генератор должен принимать начальное и конечное
         значения для генерации диапазона номеров
@@ -45,4 +49,3 @@ def  card_number_generator(start: int, end: int) -> Iterator[str]:
         formatted = f"{number:016d}"
         card_number = " ".join([formatted[i:i+4] for i in range(0, 16, 4)])
         yield card_number
-

@@ -19,6 +19,8 @@ def mask_account_card(account_card: str) -> str:
              или сообщение об ошибке"""
     type_card = " ".join(re.findall(r"\b[a-zA-Zа-яА-Я]+\b", account_card))
     nums_account = re.findall(r"\d+", account_card)
+    if not nums_account:
+        return "Ошибка! Неправильный номер."
     nums_account_str = nums_account[0]
     len_nums_account_str = len(nums_account_str)
     if len_nums_account_str == 16:
