@@ -83,10 +83,84 @@ print(sort_by_date([
         
 ____________________________________
         
-# Модуль src.generators
+## Модуль `src.generators`
 
+Модуль содержит функции-генераторы для работы с транзакциями и номерами карт.
+
+### `filter_by_currency(transactions: List[Dict[str, Any]], currency: str) -> Iterator[Dict[str, Any]]`
+
+Возвращает итератор, который поочередно выдает транзакции с указанной валютой.
+
+**Пример использования:**
+
+```python
 from src.generators import filter_by_currency
+
+transactions = [
+    {
+        "id": 1,
+        "operationAmount": {"currency": {"code": "USD"}}
+    },
+    {
+        "id": 2,
+        "operationAmount": {"currency": {"code": "RUB"}}
+    },
+]
+
 usd_transactions = filter_by_currency(transactions, "USD")
-first = next(usd_transactions)
+print(next(usd_transactions)["id"])  # 1
+
+from src.generators import transaction_descriptions
+
+### `transaction_descriptions(transactions: List[Dict[str, Any]]) -> Iterator[str]`
+
+Возвращает итератор с описаниями транзакций.
+
+**Пример:**
+```python
+from src.generators import transaction_descriptions
+
+transactions = [
+    {"description": "Перевод организации"},
+    {"description": "Перевод со счета на счет"},
+]
+
+descriptions = transaction_descriptions(transactions)
+print(next(descriptions))  # "Перевод организации"
+print(next(descriptions))  # "Перевод со счета на счет"
+
+from src.generators import card_number_generator
+
+for card in card_number_generator(1, 5):
+    print(card)
+
+# 0000 0000 0000 0001
+# 0000 0000 0000 0002
+# 0000 0000 0000 0003
+# 0000 0000 0000 0004
+# 0000 0000 0000 0005
 
 --------------------------------------------------------------------------------------
+
+```markdown
+## Тестирование
+
+Проект покрыт тестами `pytest`. Для запуска тестов выполните:
+
+```bash
+poetry run pytest
+
+Для проверки покрытия кода:
+poetry run pytest --cov=src --cov-report=html
+
+```markdown
+## Технологии
+
+- Python 3.14
+- Poetry
+- pytest (тестирование)
+- flake8, mypy (линтеры)
+
+## Автор
+
+Olga
