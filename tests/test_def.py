@@ -107,7 +107,7 @@ def test_card_stn_mask_account_card(card_stn_mask_account_card: str) -> None:
 
 def test_no_num_stn_mask_account_card(no_num_stn_mask_account_card: str) -> None:
     """Проверка без номера"""
-    assert mask_account_card(no_num_stn_mask_account_card) == "Неверный номер карты или счета"
+    assert mask_account_card(no_num_stn_mask_account_card) == "Ошибка! Неправильный номер."
 
 
 @pytest.fixture
