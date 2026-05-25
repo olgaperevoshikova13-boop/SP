@@ -7,6 +7,8 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
+    "requests (>=2.34.2,<3.0.0)",
+    "python-dotenv (>=1.2.2,<2.0.0)"
 ]
 
 
@@ -23,7 +25,8 @@ lint = [
 ]
 dev = [
     "pytest (>=9.0.3,<10.0.0)",
-    "pytest-cov (>=7.1.0,<8.0.0)"
+    "pytest-cov (>=7.1.0,<8.0.0)",
+    "types-requests (>=2.33.0.20260518,<3.0.0.0)"
 ]
 
 [tool.black]
@@ -51,4 +54,7 @@ exclude = [
     '\.venv',
     'build',
     'dist',
+    "tests/.*",
+     "htmlcov/.*",
+    ".pytest_cache/.*",
 ]
