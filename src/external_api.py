@@ -29,28 +29,30 @@ def convert_to_rubles(transaction: Dict[str, Any]) -> float:
 
     # Получаем API-ключ из переменных окружения
     api_key = os.getenv('EXCHANGE_API_KEY')
-    api_url = os.getenv('EXCHANGE_API_URL', 'https://api.apilayer.com/exchangerates_data/latest')
+    api_url = os.getenv('EXCHANGE_API_URL', 'https://api.apilayer.com/exchangerates_data/convert')
 
     if not api_key:
         raise ValueError("API ключ не найден. Установите EXCHANGE_API_KEY в .env файле")
 
     # Делаем запрос к API для получения курса валюты
     headers = {'apikey': api_key}
-    params = {'base': 'RUB', 'symbols': currency}
+    params = {
+        'to': 'RUB',
+        'from': currency,
+        'amount': amount
+    }
 
     try:
         response = requests.get(api_url, headers=headers, params=params, timeout=10)
         response.raise_for_status()
 
         data = response.json()
-        rate = data.get('rates', {}).get(currency)
+        rub_amount = data.get('result', 0)  # ← изменено
 
-        if rate:
-            # Конвертируем: сумма в валюте * курс = сумма в рублях
-            rub_amount = amount * rate
+        if rub_amount:
             return float(round(rub_amount, 2))
         else:
-            raise ValueError(f"Курс для {currency} не найден")
+            raise ValueError(f"Не удалось конвертировать {currency} в RUB")
 
     except requests.exceptions.RequestException as e:
         raise RuntimeError(f"Ошибка при запросе к API: {e}")

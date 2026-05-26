@@ -28,8 +28,9 @@ def test_convert_to_rubles_usd(mock_get: Any) -> None:
     """Тест: конвертация USD в RUB через API (мок)"""
     mock_response = Mock()
     mock_response.status_code = 200
+    # Исправленный мок-ответ для /convert
     mock_response.json.return_value = {
-        "rates": {"USD": 91.23}
+        "result": 912.3
     }
     mock_get.return_value = mock_response
 
