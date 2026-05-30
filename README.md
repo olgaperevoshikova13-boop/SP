@@ -142,6 +142,23 @@ for card in card_number_generator(1, 5):
 
 --------------------------------------------------------------------------------------
 
+## Новые функции
+
+### Чтение CSV и Excel
+
+Проект теперь поддерживает чтение транзакций из CSV и Excel-файлов.
+
+- `read_csv_transactions(file_path)` → список словарей из CSV
+- `read_excel_transactions(file_path)` → список словарей из Excel
+
+### Пример использования
+
+```python
+from src.file_processing import read_csv_transactions, read_excel_transactions
+
+csv_data = read_csv_transactions("data/transactions.csv")
+excel_data = read_excel_transactions("data/transactions_excel.xlsx")
+
 ```markdown
 ## Тестирование
 

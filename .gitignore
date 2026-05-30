@@ -219,3 +219,7 @@ __marimo__/
 
 cat .gitignore | grep .env
 logs/
+
+logs/
+transactions.csv
+transactions_excel.xlsx
