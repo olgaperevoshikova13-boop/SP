@@ -14,7 +14,7 @@ def test_read_csv_transactions_success(mock_read_csv):
 
     result = read_csv_transactions("fake.csv")
     assert result == [{"id": 1, "amount": 100}]
-    mock_read_csv.assert_called_once_with("fake.csv")
+    mock_read_csv.assert_called_once_with("fake.csv", sep=';')
 
 
 @patch("pandas.read_csv")

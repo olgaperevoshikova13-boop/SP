@@ -21,7 +21,7 @@ def read_csv_transactions(file_path: str) -> List[Dict[str, Any]]:
     """Считывает транзакции из CSV-файла и возвращает список словарей."""
     logger.debug(f"Попытка чтения CSV: {file_path}")
     try:
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(file_path, sep=';')
         result = df.to_dict(orient="records")
         logger.info(f"Успешно загружено {len(result)} транзакций из CSV")
         return result  # type: ignore
