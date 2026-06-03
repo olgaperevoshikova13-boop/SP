@@ -1,10 +1,9 @@
 
 
 def filter_by_state(list_of_dicts: list, state: str = 'EXECUTED') -> list[dict]:
-    """Фильтрует список словарей по ключу 'state'"""
     new_list_of_dicts = []
     for item in list_of_dicts:
-        if item["state"] == state:
+        if isinstance(item, dict) and "state" in item and item["state"] == state:
             new_list_of_dicts.append(item)
     return new_list_of_dicts
 

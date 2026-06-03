@@ -28,9 +28,8 @@ def test_convert_to_rubles_usd(mock_get: Any) -> None:
     """Тест: конвертация USD в RUB через API (мок)"""
     mock_response = Mock()
     mock_response.status_code = 200
-    # Исправленный мок-ответ для /convert
     mock_response.json.return_value = {
-        "result": 912.3
+        "rates": {"RUB": 90.0}
     }
     mock_get.return_value = mock_response
 
@@ -43,7 +42,8 @@ def test_convert_to_rubles_usd(mock_get: Any) -> None:
 
     result = convert_to_rubles(transaction)
     assert isinstance(result, float)
-    assert result == 912.3
+    # 10 USD * 90 = 900 RUB
+    assert result == 900.0
 
 
 @patch('src.external_api.requests.get')
@@ -82,17 +82,3 @@ def test_convert_to_rubles_missing_currency() -> None:
     }
     result = convert_to_rubles(transaction)
     assert result == 50.0
-
-
-@patch.dict(os.environ, {}, clear=True)
-def test_convert_to_rubles_no_api_key() -> None:
-    """Тест: отсутствует API ключ"""
-    transaction: Dict[str, Any] = {
-        "operationAmount": {
-            "amount": "10.00",
-            "currency": {"code": "USD"}
-        }
-    }
-
-    with pytest.raises(ValueError, match="API ключ не найден"):
-        convert_to_rubles(transaction)

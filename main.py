@@ -92,10 +92,21 @@ def main() -> None:
 
     print(f"Всего банковских операций в выборке: {len(filtered)}")
     for t in filtered:
-        amount = convert_to_rubles(t)
-        cur = t.get("operationAmount", {}).get("currency", {}).get("code", "")
-        print(f"{t.get('date', '')[:10]} {t.get('description', '')}")
-        print(f"Сумма: {amount} {cur if cur != 'RUB' else 'руб.'}")
+        if not isinstance(t, dict) or not t:
+            continue
+        date_raw = t.get("date", "")
+        date_str = f"{date_raw[8:10]}.{date_raw[5:7]}.{date_raw[0:4]}" if len(date_raw) >= 10 else date_raw
+        description = t.get("description", "")
+        from_str = t.get("from", "")
+        to_str = t.get("to", "")
+        amount_data = t.get("operationAmount", {})
+        amount = amount_data.get("amount", "0")
+        currency = amount_data.get("currency", {}).get("code", "RUB")
+
+        print(f"{date_str} {description}")
+        if from_str or to_str:
+            print(f"{from_str} -> {to_str}")
+        print(f"Сумма: {amount} {currency}\n")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,3 @@
-import os
 from typing import Any
 from typing import Dict
 
@@ -11,12 +10,6 @@ load_dotenv()
 def convert_to_rubles(transaction: Dict[str, Any]) -> float:
     """
     Конвертирует сумму транзакции в рубли.
-
-    Args:
-        transaction: Словарь с данными о транзакции
-
-    Returns:
-        Сумма в рублях (float)
     """
     # Получаем сумму и валюту из транзакции
     amount_value = transaction.get('operationAmount', {}).get('amount', 0)
@@ -27,32 +20,21 @@ def convert_to_rubles(transaction: Dict[str, Any]) -> float:
     if currency == 'RUB':
         return amount
 
-    # Получаем API-ключ из переменных окружения
-    api_key = os.getenv('EXCHANGE_API_KEY')
-    api_url = os.getenv('EXCHANGE_API_URL', 'https://api.apilayer.com/exchangerates_data/convert')
-
-    if not api_key:
-        raise ValueError("API ключ не найден. Установите EXCHANGE_API_KEY в .env файле")
-
-    # Делаем запрос к API для получения курса валюты
-    headers = {'apikey': api_key}
-    params = {
-        'to': 'RUB',
-        'from': currency,
-        'amount': amount
-    }
+    # Используем бесплатный API без ключа
+    url = f"https://api.exchangerate-api.com/v4/latest/{currency}"
 
     try:
-        response = requests.get(api_url, headers=headers, params=params, timeout=10)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
 
         data = response.json()
-        rub_amount = data.get('result', 0)  # ← изменено
+        rate = data.get('rates', {}).get('RUB')
 
-        if rub_amount:
-            return float(round(rub_amount, 2))
+        if rate:
+            rub_amount = amount * rate
+            return round(rub_amount, 2)  # type: ignore
         else:
-            raise ValueError(f"Не удалось конвертировать {currency} в RUB")
+            raise ValueError(f"Курс для {currency} не найден")
 
     except requests.exceptions.RequestException as e:
         raise RuntimeError(f"Ошибка при запросе к API: {e}")
