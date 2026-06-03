@@ -1,10 +1,15 @@
 import logging
+from typing import Any
+
+import pandas as pd
 
 from src.category_counter import count_categories
 from src.external_api import convert_to_rubles
 from src.file_processing import read_csv_transactions
 from src.file_processing import read_excel_transactions
 from src.filters import filter_by_description
+from src.masks import get_mask_account
+from src.masks import get_mask_card_number
 from src.processing import filter_by_state
 from src.processing import sort_by_date
 from src.utils import load_transactions
@@ -43,6 +48,34 @@ def ask_yes_no(question: str) -> bool:
         if ans == "нет":
             return False
         print("Пожалуйста, ответьте 'да' или 'нет'.")
+
+
+def mask_card_or_account(card_or_account: Any) -> str:
+    """Маскирует номер карты или счета в строке."""
+    if card_or_account is None:
+        return ""
+    card_or_account_str = str(card_or_account)
+
+    if not card_or_account_str:
+        return ""
+
+    import re
+
+    if "Счет" in card_or_account_str or "счет" in card_or_account_str:
+        numbers = re.findall(r"\d+", card_or_account_str)
+        if numbers:
+            account_number = numbers[-1]
+            masked_account = get_mask_account(account_number)
+            return card_or_account_str.replace(account_number, masked_account)
+        return card_or_account_str
+    else:
+        numbers = re.findall(r"\d+", card_or_account_str)
+        if numbers:
+            card_number = numbers[-1]
+            if len(card_number) == 16:
+                masked_card = get_mask_card_number(card_number)
+                return card_or_account_str.replace(card_number, masked_card)
+        return card_or_account_str
 
 
 def main() -> None:
@@ -94,19 +127,44 @@ def main() -> None:
     for t in filtered:
         if not isinstance(t, dict) or not t:
             continue
-        date_raw = t.get("date", "")
-        date_str = f"{date_raw[8:10]}.{date_raw[5:7]}.{date_raw[0:4]}" if len(date_raw) >= 10 else date_raw
-        description = t.get("description", "")
-        from_str = t.get("from", "")
-        to_str = t.get("to", "")
-        amount_data = t.get("operationAmount", {})
-        amount = amount_data.get("amount", "0")
-        currency = amount_data.get("currency", {}).get("code", "RUB")
+        # Пропускаем пустые строки
+        if t.get("id") is None or (hasattr(pd, 'isna') and pd.isna(t.get("id"))):
+            continue
 
+        # Форматируем дату
+        date_raw = str(t.get("date", ""))
+        if len(date_raw) >= 10:
+            date_str = f"{date_raw[8:10]}.{date_raw[5:7]}.{date_raw[0:4]}"
+        else:
+            date_str = date_raw
+
+        description = t.get("description", "")
+
+        # Маскируем from и to
+        from_str = mask_card_or_account(t.get("from", ""))
+        to_str = mask_card_or_account(t.get("to", ""))
+
+        # Получаем сумму и валюту (из CSV поле amount, из JSON — operationAmount.amount)
+        if "operationAmount" in t:
+            amount_data = t.get("operationAmount", {})
+            amount = amount_data.get("amount", "0")
+            currency = amount_data.get("currency", {}).get("code", "RUB")
+        else:
+            amount = t.get("amount", 0)
+            currency = t.get("currency_code", "RUB")
+
+        # Форматируем сумму
+        try:
+            amount_float = float(amount)
+            amount_str = f"{amount_float:.2f}"
+        except (ValueError, TypeError):
+            amount_str = str(amount)
+
+        # Выводим транзакцию
         print(f"{date_str} {description}")
         if from_str or to_str:
             print(f"{from_str} -> {to_str}")
-        print(f"Сумма: {amount} {currency}\n")
+        print(f"Сумма: {amount_str} {currency}\n")
 
 
 if __name__ == "__main__":
